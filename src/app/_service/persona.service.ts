@@ -1,3 +1,4 @@
+import { GenericService } from './generic.service';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { HttpClient} from '@angular/common/http'
@@ -6,33 +7,33 @@ import { Subject } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
-export class PersonaService {
+export class PersonaService extends GenericService<Persona> {
 
   personaCambio = new Subject<Persona[]>();
   mensajeCambio = new Subject<string>();
-  private url: string = `${environment.HOST}/personas`
-
-  constructor(private http: HttpClient) { }
 
 
-  listar(){
-    return this.http.get<Persona[]>(this.url);
+  constructor(protected http: HttpClient) {
+    super(
+      http,
+      `${environment.HOST}/personas`)
   }
 
-  listarPorId(id: number) {
-    return this.http.get<Persona>(`${this.url}/${id}`);
-  }
+ //get Subjects
+ getPersonaCambio() {
+  return this.personaCambio.asObservable();
+}
 
-  registrar(persona: Persona) {
-    return this.http.post(this.url, persona);
-  }
+getMensajeCambio() {
+  return this.mensajeCambio.asObservable();
+}
 
-  modificar(persona: Persona) {
-    return this.http.put(this.url, persona);
-  }
+//set Subjects
+setPersonaCambio(personas: Persona[]) {
+  this.personaCambio.next(personas);
+}
 
-  eliminar(id: number){
-    return this.http.delete(`${this.url}/${id}`);
-  }
-
+setMensajeCambio(mensaje: string) {
+  this.mensajeCambio.next(mensaje);
+}
 }
